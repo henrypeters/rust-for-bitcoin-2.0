@@ -6,26 +6,36 @@
 # Rust test suite
 cargo test --test lab_06
 
-# Decode the unconfirmed transaction with verbosity 2
+# Decode the transaction with verbosity 2
 # (verbosity 2 includes each input's previous output value)
-bitcoin-cli getrawtransaction 7c2f4a1b3d5e6f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2 2
+bitcoin-cli getrawtransaction 85e8d711749065243ec2b80b9a3f451ca0c196e0f8cf27478718adcf36530bd8 2   # txid
 ```
 
 ## Terminal output
-
-```
-$ bitcoin-cli getrawtransaction \
-    7c2f4a1b3d5e6f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2 2
+<!-- Paste the relevant terminal output here -->
+```bash
+bitcoin@backend1:/$ bitcoin-cli getrawtransaction 85e8d711749065243ec2b80b9a3f451ca0c196e0f8cf27478718adcf36530bd8 2
 {
-  "txid": "7c2f4a1b3d5e6f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2",
+  "txid": "85e8d711749065243ec2b80b9a3f451ca0c196e0f8cf27478718adcf36530bd8",
+  "hash": "6e3fe4d4fb5b8a4c067cc5318c576181130b2c87d2e254757a87cdf384e5c12b",
+  "version": 2,
+  "size": 222,
   "vsize": 141,
+  "weight": 561,
+  "locktime": 104,
   "vin": [
     {
-      "txid": "a3f1b2c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2",
+      "txid": "9215a769808de7b501f1ddf5b689830ad028a95651029851bfedd8086bcb7165",
       "vout": 0,
-      "prevout": {
-        "value": 50.00000000
-      }
+      "scriptSig": {
+        "asm": "",
+        "hex": ""
+      },
+      "txinwitness": [
+        "304402200dc3d4f9719ff14b7604fe3b40d1211f7e89f2cca452a32db77316df0c3621ef02205a23dbf51ee9912392a4a3a26178af34ed21c429822df9452c1b8e0ebcb98be401",
+        "02a016d02eed09f4474152796b722c3bad06ed261e2b52d0aa8a8d917ed5cd4819"
+      ],
+      "sequence": 4294967293
     }
   ],
   "vout": [
@@ -33,55 +43,39 @@ $ bitcoin-cli getrawtransaction \
       "value": 1.00000000,
       "n": 0,
       "scriptPubKey": {
-        "hex": "0014fc8d2b3a4e5f6c7d8e9f0a1b2c3d4e5f6a7b8c9d",
-        "address": "bcrt1qr9lf3y4w7nhpzx4v5djgtz6vt3s2yfx0gxfhak"
+        "asm": "0 1929e5d9307157a3055b2f885af7144fb7255549",
+        "desc": "addr(bcrt1qry57tkfsw9t6xp2m97y94ac5f7mj242f3a56mu)#54vw0nrr",
+        "hex": "00141929e5d9307157a3055b2f885af7144fb7255549",
+        "address": "bcrt1qry57tkfsw9t6xp2m97y94ac5f7mj242f3a56mu",
+        "type": "witness_v0_keyhash"
       }
     },
     {
       "value": 48.99997180,
       "n": 1,
       "scriptPubKey": {
-        "hex": "0014d9ac5a8cf6c900964b77ef5a3171806038c5904a",
-        "address": "bcrt1qm5xk2v8ekzqynfm3a7v5wzxcqwrpezs8dfrnhe"
+        "asm": "0 fedaea27707566a51be3d68ab38e3abc8a9ed2bb",
+        "desc": "addr(bcrt1qlmdw5fmsw4n22xlr669t8r36hj9fa54mhsy7v8)#454elhv3",
+        "hex": "0014fedaea27707566a51be3d68ab38e3abc8a9ed2bb",
+        "address": "bcrt1qlmdw5fmsw4n22xlr669t8r36hj9fa54mhsy7v8",
+        "type": "witness_v0_keyhash"
       }
     }
-  ]
+  ],
+  "hex": "020000000001016571cb6b08d8edbf5198025156a928d00a8389b6f5ddf101b5e78d8069a715920000000000fdffffff0200e1f505000000001600141929e5d9307157a3055b2f885af7144fb7255549fc05102401000000160014fedaea27707566a51be3d68ab38e3abc8a9ed2bb0247304402200dc3d4f9719ff14b7604fe3b40d1211f7e89f2cca452a32db77316df0c3621ef02205a23dbf51ee9912392a4a3a26178af34ed21c429822df9452c1b8e0ebcb98be4012102a016d02eed09f4474152796b722c3bad06ed261e2b52d0aa8a8d917ed5cd481968000000"
 }
-
-Value conservation audit:
-  sum(inputs)          = 50.00000000 BTC
-  payment output (vout 0) =  1.00000000 BTC  → receiver
-  change output  (vout 1) = 48.99997180 BTC  → miner (change)
-  fee                  =  0.00002820 BTC
-  ─────────────────────────────────────────
-  50.00000000 = 1.00000000 + 48.99997180 + 0.00002820  ✓
 ```
 
 ## Evidence references
-
-All four automated Rust tests pass (`cargo test --test lab_06`). The decoded transaction
-identifies the single consumed input (`a3f1...`:`0`, worth 50 BTC), the receiver output
-(1.0 BTC to `bcrt1qr9...`), the change output (48.9999718 BTC back to the miner), and
-the implicit fee (0.0000282 BTC). Value is conserved: inputs equal the sum of all outputs
-plus the fee.
+<!-- Describe or link to screenshots, logs, or other supporting evidence -->
+!["lab 06 output"](evidence/lab_06.png)
+<!-- My tests -->
+!["lab 06 test"](evidence/tests/lab6_test.png)
 
 ## Explanation
 
-**Value conservation** is a core Bitcoin protocol rule: for any non-coinbase transaction,
-the sum of all input values must equal the sum of all output values plus the miner fee.
-Nodes enforce this at validation time and reject any transaction that creates coins from
-nothing.
+**Value conservation** is a core Bitcoin protocol rule: for any non-coinbase transaction, the sum of all input values must equal the sum of all output values plus the miner fee. Nodes enforce this at validation time and reject any transaction that creates coins from nothing.
 
-The **fee has no dedicated output** because it is defined by omission, not declaration.
-A transaction simply does not need to assign all input value to outputs. Whatever input
-value is left unassigned — `sum(inputs) − sum(outputs)` — is implicitly claimed by the
-miner who includes the transaction in a block as part of the coinbase reward. This
-design means the sender does not need to know the miner's address in advance, and it
-makes fee bumping (reducing outputs) straightforward without changing the transaction
-structure.
+**The fee has no dedicated output** because it is defined by omission. A transaction simply does not assign all input value to outputs. Whatever input value is left unassigned — `sum(inputs) − sum(outputs)` — is implicitly claimed by the miner who includes the transaction in a block as part of the coinbase reward. This means the sender does not need to know the miner's address in advance.
 
-**Virtual size (vsize)** is used rather than raw byte size because SegWit transactions
-have two components: the base data (counted at full weight) and the witness data (counted
-at one-quarter weight). Vsize = `ceil(weight / 4)`, and fees are priced in sat/vbyte
-against this virtual size. A 141-vbyte transaction at 20 sat/vbyte would pay 2820
-satoshis (0.0000282 BTC), matching the fee observed above.
+**Virtual size (vsize)** is used rather than raw byte size because SegWit transactions have two components: base data (counted at full weight) and witness data (counted at one-quarter weight). Vsize = `ceil(weight / 4)`. Fees are priced in sat/vbyte against this virtual size, which is why SegWit transactions are cheaper to send than legacy transactions of similar byte length.

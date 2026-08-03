@@ -1,56 +1,44 @@
 //! Lab 04 — inspect UTXOs and outpoints.
 
 use crate::model::{OutPoint, Utxo};
-use crate::rpc::{parse_cli_value, RpcClient};
-use crate::{LabError, LabResult};
+use crate::rpc::RpcClient;
+use crate::LabResult;
+use crate::rpc::{parse_cli_value, required_f64, required_string, required_u64};
+use crate::LabError;
+use serde_json::Value;
 
 /// Return all UTXOs tracked by the selected wallet.
 pub fn list_unspent<C: RpcClient>(client: &C, wallet_name: &str) -> LabResult<Vec<Utxo>> {
-    let raw = client.call(Some(wallet_name), "listunspent", &[])?;
-    let value = parse_cli_value(&raw)?;
-    let array = value
-        .as_array()
-        .ok_or_else(|| LabError::Parse("expected array from listunspent".to_owned()))?;
+    let call = client.call(Some(wallet_name), "listunspent", &[])?;
+    let value: Value = serde_json::from_str(&call).map_err(|e| LabError::Parse(e.to_string()))?;
 
-    array
+    let entries = value
+        .as_array()
+        .ok_or(LabError::MissingField("listunspent"))?;
+
+    entries
         .iter()
         .map(|entry| {
-            let txid = entry
-                .get("txid")
-                .and_then(|v| v.as_str())
-                .map(ToOwned::to_owned)
-                .ok_or(LabError::MissingField("txid"))?;
-            let vout = entry
-                .get("vout")
-                .and_then(|v| v.as_u64())
-                .map(|v| v as u32)
-                .ok_or(LabError::MissingField("vout"))?;
-            let address = entry
-                .get("address")
-                .and_then(|v| v.as_str())
-                .map(ToOwned::to_owned);
-            let script_pub_key = entry
-                .get("scriptPubKey")
-                .and_then(|v| v.as_str())
-                .map(ToOwned::to_owned)
-                .ok_or(LabError::MissingField("scriptPubKey"))?;
-            let amount = entry
-                .get("amount")
-                .and_then(|v| v.as_f64())
-                .ok_or(LabError::MissingField("amount"))?;
-            let confirmations = entry
-                .get("confirmations")
-                .and_then(|v| v.as_u64())
-                .ok_or(LabError::MissingField("confirmations"))?;
-            let spendable = entry
-                .get("spendable")
-                .and_then(|v| v.as_bool())
+            let txid = required_string(entry, "txid")?;
+
+            let vout = required_u64(entry, "vout")?;
+
+            let address = required_string(entry, "address")?;
+
+            let script_pub_key = required_string(entry, "scriptPubKey")?;
+
+            let amount = required_f64(entry, "amount")?;
+
+            let confirmations = required_u64(entry, "confirmations")?;
+
+            let spendable = entry["spendable"]
+                .as_bool()
                 .ok_or(LabError::MissingField("spendable"))?;
 
             Ok(Utxo {
                 txid,
-                vout,
-                address,
+                vout: vout.try_into().unwrap(),
+                address: Some(address),
                 script_pub_key,
                 amount,
                 confirmations,

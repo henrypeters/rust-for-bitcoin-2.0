@@ -2,80 +2,64 @@
 
 ## Commands used
 
-```bash
-# Rust test suite (mock RPC — no live node required for automated grading)
-cargo test --test lab_01
-
-# Bitcoin Core RPCs issued by the implementation against a live Polar node
-bitcoin-cli getblockchaininfo
-bitcoin-cli getblockcount
-bitcoin-cli getbestblockhash
-```
+<!-- List every bitcoin-cli command and cargo test command you ran -->
+- cargo test --test lab_01
+- bitcoin-cli getblockchaininfo
+- bitcoin-cli getblockcount
+- bitcoin-cli getbestblockhash
 
 ## Terminal output
 
-```
-$ cargo test --test lab_01
-running 4 tests
-test builds_verified_network_snapshot ... ok
-test reads_best_block_hash ... ok
-test reads_block_height ... ok
-test reads_regtest_chain ... ok
-test result: ok. 4 passed; 0 failed
-
-$ bitcoin-cli getblockchaininfo
+<!-- Paste the relevant terminal output here -->
+```bash
+bitcoin@backend1:/$ bitcoin-cli getblockchaininfo
 {
   "chain": "regtest",
-  "blocks": 0,
-  "headers": 0,
-  "bestblockhash": "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206",
+  "blocks": 1,
+  "headers": 1,
+  "bestblockhash": "1e1112f04b1e814c2947202ce137d82ae95eb4735c687107b30e38d31c35255c",
+  "bits": "207fffff",
+  "target": "7fffff0000000000000000000000000000000000000000000000000000000000",
   "difficulty": 4.656542373906925e-10,
-  "chainwork": "0000000000000000000000000000000000000000000000000000000000000002",
-  "pruned": false
+  "time": 1785752066,
+  "mediantime": 1785752066,
+  "verificationprogress": 1,
+  "initialblockdownload": false,
+  "chainwork": "0000000000000000000000000000000000000000000000000000000000000004",
+  "size_on_disk": 590,
+  "pruned": false,
+  "warnings": [
+  ]
 }
-
-$ bitcoin-cli getblockcount
-0
-
-$ bitcoin-cli getbestblockhash
-0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206
-```
-
-The `inspect_network` function returned:
-```
-NetworkSnapshot {
-    chain: "regtest",
-    block_height: 0,
-    best_block_hash: "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206",
-}
+bitcoin@backend1:/$ bitcoin-cli getblockcount
+1
+bitcoin@backend1:/$ bitcoin-cli getbestblockhash
+1e1112f04b1e814c2947202ce137d82ae95eb4735c687107b30e38d31c35255c
 ```
 
 ## Evidence references
-
-All four automated Rust tests pass (`cargo test --test lab_01`). The terminal output above
-was captured from a Polar regtest network with a single Bitcoin Core node at its genesis
-state (height 0). The `chain` field confirms `regtest` is active. The `bestblockhash`
-matches the well-known regtest genesis block hash.
+<!-- Describe or link to screenshots, logs, or other supporting evidence -->
+![lab 01 output](evidence/lab_01.png)
+<!-- My tests -->
+![lab 01 test_output](evidence/tests/lab1_test.png)
 
 ## Explanation
 
-**Polar** is a desktop application that makes it easy to create and manage local Bitcoin
-test networks. It provides a graphical interface for spinning up Bitcoin Core and Lightning
-Network nodes without manual configuration. Polar handles the networking and configuration
-boilerplate so developers can focus on their application logic.
+<!-- Explain what Polar is, what Docker is, what Bitcoin Core is, and what regtest mode is -->
+**POLAR:**
+Polar is a desktop app that lets you spin up local Bitcoin and Lightning Network nodes with one click rather than doing it manually. It uses Docker under the hood so you don't have to configure anything manually. Polar is used for development and testing.
 
-**Docker** is the container runtime that Polar uses under the hood. Each Bitcoin Core or
-Lightning node runs inside its own isolated Docker container. Docker ensures that node
-software, dependencies, and port mappings are reproducible across different developer
-machines without polluting the host system.
+**Docker:**
+Docker is a tool that runs software inside isolated containers. Polar uses it to run eachh Bitcoin Core node in its own container, so they don't interfere with your system or each other.
 
-**Bitcoin Core** is the reference implementation of the Bitcoin protocol. It is a full node
-that validates every block and transaction, maintains the UTXO set, and exposes the JSON-RPC
-interface that `bitcoin-cli` (and our `ProcessRpc` client) communicates with. In these labs
-it acts as the authoritative source of blockchain state.
+**Bitcoin Core:**
+It is the reference implementation of Bitcoin. It's a full node that validates blocks and transactions, maintains the UTXO set, and exposes a JSON-RPC interface that bitcoin-cl talks to. It's what actually running inside the Polar container.
 
-**Regtest** (regression test mode) is a private, local blockchain where the node can mine
-blocks on demand with essentially zero proof-of-work difficulty. No real coins or internet
-connectivity are involved. It lets developers test transaction construction, coin maturity,
-reorganizations, and other protocol behaviour deterministically and instantly, rather than
-waiting for real testnet confirmations.
+**Regtest mode:**
+Regtest is an acronym short for "regression test" mode. A private local blockchain where you control everything. You can mine blocks instantly on demand, there's no real money involved, and no internet connection is needed. It's the standard environment for developing and testing Bitcoi applications because you get deterministic, repeatable behaviour.
+
+
+
+
+
+
