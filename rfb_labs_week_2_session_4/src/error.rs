@@ -44,7 +44,8 @@ impl fmt::Display for LibraryError {
     fn fmt(&self, _formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         // TODO(Part 2): return a useful, human-readable message for every
         // variant. Include the ids and numbers the variant carries.
-        todo!("implement Display for LibraryError")
+        // todo!("implement Display for LibraryError")
+        
     }
 }
 

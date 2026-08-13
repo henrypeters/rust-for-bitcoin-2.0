@@ -35,11 +35,20 @@ Answer in your own words. Add both ownership compiler errors from Part 7 as
 fenced text blocks, then explain what caused each.
 
 1. Why is `LoanStatus` an enum rather than a `bool` plus two `Option` fields?
+- `LoanStatus` is an enum rather than a `bool` plus two `Option` fields because the struct alternative allows impossible states. For example: `is_on_loan: false` with `borrowed_by: Some(5)`, which is contradictory. The enum makes invalid states unrepresentable. Each state is self-contained and mutually exclusive.
+
 2. What does `match` force you to do when a fourth `MediaKind` is added later?
+- `match` statements allow you to handle every possible outcome of a particular type in this case, `MediaKind` enum, match statment handles every variant explicity also when a fourth variant of `MediaKind` is added, the `match` statement also handles it explicitly. 
+
 3. `Item::new` takes `String` rather than `&str`. Who owns the title afterwards?
+- `Item` owns the title since it's type is `String` which is an owned type not `&str` which is a reference
+
 4. Why does `add_item` take `self` by `&mut` but `item` by value?
-5. When `add_item` returns `Err`, what happened to the `Item` the caller passed
-   in? Was that a good design choice, and what is the alternative?
+- The `add_item` function adds item to the library collection, in the process of adding item to the library collection, we are mutating `self` which is the `Library` struct. The `add_item` is taking ownership of the item passed into it as a parameter.
+
+5. When `add_item` returns `Err`, what happened to the `Item` the caller passed in? Was that a good design choice, and what is the alternative?
+
+
 6. Why does `find_item` return `Option<&Item>` rather than `Option<Item>`?
 7. What is the lifetime `'a` in `items_by_author` actually saying?
 8. Why can't `checkout` hold a `&mut Item` and a `&mut Member` from the same
