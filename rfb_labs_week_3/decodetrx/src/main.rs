@@ -3,27 +3,7 @@ use decodetrx::decode_transaction;
 
 fn main() {
     // ── Build the CLI definition ───────────────────────────────────────────────
-    // clap's builder API: we describe every argument here, then parse argv.
-    let matches = Command::new("decodetrx")
-        .version("1.0")
-        .about("Bitcoin Transaction Decoder — parses a raw hex transaction into JSON")
-        // One required positional argument: the raw transaction hex string
-        .arg(
-            Arg::new("transaction_hex")
-                .help("Raw transaction hex string (required)")
-                .required(true)
-                .index(1),   // positional: first argument after the binary name
-        )
-        .get_matches();  // parse std::env::args()
-
-    // ── Retrieve the argument value ────────────────────────────────────────────
-    // get_one::<String> returns an Option<&String>; unwrap is safe because the
-    // argument is marked required above — clap will have already exited with an
-    // error message if it was missing.
-    let transaction_hex = matches
-        .get_one::<String>("transaction_hex")
-        .unwrap()
-        .to_string();
+    // Retrieve transaction hex argument
 
     // ── Call the decoder from the library ─────────────────────────────────────
     match decode_transaction(transaction_hex) {
